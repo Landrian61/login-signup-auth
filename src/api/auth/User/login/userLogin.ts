@@ -5,12 +5,15 @@ import rateLimit from "express-rate-limit";
 import session from "express-session";
 import prisma from "../../../../prisma/client";
 
+const uuid = require("uuid");
 const router = Router();
+
+const sessions: any = {};
 
 // rate limiter middleware
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // limit each IP to 100 requests
+  max: 10, // limit each IP to 10 requests
   message: "Too many login attempts, please try again after 15 minutes",
 });
 
@@ -53,9 +56,17 @@ router.get("/user/login", limiter, async (req, res) => {
 
         return res.status(400).json({ error: "Invalid credentials" });
       } else {
-        res.json({ message: "Login successful", success: true });
+        // res.json({ message: "Login successful", success: true });
 
         // start a session
+        const sessionId = uuid();
+        sessions[sessionId] = {
+          userId: user.id,
+          email: user.email,
+          name: user.name,
+        };
+        res.set("Set-Cookie", `sessionId=${sessionId}; HttpOnly; Secure`);
+        res.send({ message: "Login successful" });
       }
     }
   } catch (error: any) {

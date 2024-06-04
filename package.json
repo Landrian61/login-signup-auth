@@ -24,6 +24,7 @@
     "resend": "^3.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
+    "uuid": "^9.0.1",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {

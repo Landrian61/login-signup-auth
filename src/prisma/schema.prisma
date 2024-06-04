@@ -4,52 +4,6 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-// datasource db {
-//   provider = "mongodb"
-//   url      = env("DATABASE_URL")
-// }
-
-// generator client {
-//   provider = "prisma-client-js"
-// }
-
-// model User {
-//   id                          String @id @default(auto()) @map("_id") @db.ObjectId
-//   name                        String
-//   email                       String @unique
-//   password                    String
-//   isVerified                  Boolean @default(false)
-//   verificationCode            Int?
-//   verificationAttempts        Int @default(0)
-//   verificationCodeExpiry      DateTime?
-//   forgotPasswordToken         String?
-//   forgotPasswordTokenExpiry   DateTime?
-//   verifyEmailToken            String?
-//   verifyEmailTokenExpiry      DateTime?
-// }
-
-// model Admin {
-//   id                          String @id @default(auto()) @map("_id") @db.ObjectId
-//   name                        String
-//   email                       String @unique
-//   password                    String
-//   isVerified                  Boolean @default(false)
-//   verificationCode            Int?
-//   verificationAttempts        Int @default(0)
-//   verificationCodeExpiry      DateTime?
-//   forgotPasswordToken         String?
-//   forgotPasswordTokenExpiry   DateTime?
-//   verifyEmailToken            String?
-//   verifyEmailTokenExpiry      DateTime?
-// }
-
-// model Workspace  {
-//   id                          String @id @default(auto()) @map("_id") @db.ObjectId
-//   name                        String
-//   description                 String?
-//   createdAt                   DateTime @default(now())
-//   updatedAt                   DateTime @updatedAt
-// }
 
 datasource db {
   provider = "mongodb"
