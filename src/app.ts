@@ -11,7 +11,12 @@ import userChangePasswordRouter from "./api/auth/User/changePassword/changePassw
 import workspaceRouter from "./api/routes/workspaceRoutes";
 require("dotenv").config();
 
+const cors = require("cors");
 const app = express();
+
+//use cors
+app.use(cors());
+
 const port = process.env.PORT || 4000;
 
 mongoose

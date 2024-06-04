@@ -1,14 +1,11 @@
 import { Router } from "express";
-import { PrismaClient } from "@prisma/client";
 import bcryptjs from "bcryptjs";
 import rateLimit from "express-rate-limit";
 import session from "express-session";
 import prisma from "../../../../prisma/client";
+import { Session } from "express-session";
 
-const uuid = require("uuid");
 const router = Router();
-
-const sessions: any = {};
 
 // rate limiter middleware
 const limiter = rateLimit({
@@ -33,9 +30,24 @@ router.use(
   })
 );
 
+interface UserSession extends Session {
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  };
+}
+
 //user login
-router.get("/user/login", limiter, async (req, res) => {
+router.post("/user/login", limiter, async (req, res) => {
   try {
+    // Check if the user is already logged in
+    if ((req.session as UserSession).user) {
+      return res
+        .status(200)
+        .json({ message: "User already logged in", success: true });
+    }
+
     const { email, password } = req.body;
 
     // check if user exists in the database
@@ -51,27 +63,45 @@ router.get("/user/login", limiter, async (req, res) => {
       // compare password
       const isMatch = await bcryptjs.compare(password, user.password);
 
+      console.log(req.session);
       if (!isMatch) {
         // increment login attempts
 
         return res.status(400).json({ error: "Invalid credentials" });
       } else {
-        // res.json({ message: "Login successful", success: true });
-
         // start a session
-        const sessionId = uuid();
-        sessions[sessionId] = {
-          userId: user.id,
-          email: user.email,
+        (req.session as UserSession).user = {
+          id: user.id,
           name: user.name,
+          email: user.email,
         };
-        res.set("Set-Cookie", `sessionId=${sessionId}; HttpOnly; Secure`);
-        res.send({ message: "Login successful" });
+
+        // store user in cookie
+        res.cookie("user", user.id, {
+          maxAge: 24 * 60 * 60 * 1000,
+          httpOnly: true,
+          secure: true,
+        });
+
+        console.log(req.session);
+        res.json({ message: "Login successful", success: true });
       }
     }
   } catch (error: any) {
     return res.status(400).json({ error: error.message });
   }
+});
+
+router.get("/user/logout", async (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Error destroying session");
+      return res.status(400).json({ error: "Error destroying session" });
+    }
+
+    res.clearCookie("user");
+    res.json({ message: "Logout successful" });
+  });
 });
 
 export default router;

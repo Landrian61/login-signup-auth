@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { PrismaClient } from "@prisma/client";
 import bcryptjs from "bcryptjs";
 import rateLimit from "express-rate-limit";
 import session from "express-session";
+import { Session } from "express-session";
 import prisma from "../../../../prisma/client";
 
 const router = Router();
@@ -30,6 +30,14 @@ router.use(
   })
 );
 
+interface AdminSession extends Session {
+  admin: {
+    id: number;
+    name: string;
+    email: string;
+  };
+}
+
 //admin login
 router.get("/admin/login", limiter, async (req, res) => {
   try {
@@ -53,14 +61,39 @@ router.get("/admin/login", limiter, async (req, res) => {
 
         return res.status(400).json({ error: "Invalid credentials" });
       } else {
-        res.json({ message: "Login successful", success: true });
-
         // start a session
+        (req.session as AdminSession).admin = {
+          id: admin.id,
+          name: admin.name,
+          email: admin.email,
+        };
+
+        // store admin in cookie
+        res.cookie("admin", admin.id, {
+          maxAge: 24 * 60 * 60 * 1000,
+          httpOnly: true,
+          secure: true,
+        });
+
+        console.log(req.session);
+        res.json({ message: "Login successful", success: true });
       }
     }
   } catch (error: any) {
     return res.status(400).json({ error: error.message });
   }
+});
+
+router.get("/admin/logout", async (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Error destroying session");
+      return res.status(400).json({ error: "Error destroying session" });
+    }
+
+    res.clearCookie("user");
+    res.json({ message: "Logout successful" });
+  });
 });
 
 export default router;
