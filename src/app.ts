@@ -9,6 +9,7 @@ import adminChangePasswordRouter from "./api/auth/admin/changePassword/changePas
 import userForgotPasswordRouter from "./api/auth/User/changePassword/forgotPassword";
 import userChangePasswordRouter from "./api/auth/User/changePassword/changePassword";
 import workspaceRouter from "./api/routes/workspaceRoutes";
+require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || 4000;

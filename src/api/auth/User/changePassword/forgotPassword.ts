@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import prisma from "../../../../prisma/client";
 
 const router = Router();
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend("re_RSA9if9i_KtTLPVvJ8peFJgr1u9fMh6Be");
 
 // get a single user from the database
 router.get("/user/:id", async (req, res) => {
