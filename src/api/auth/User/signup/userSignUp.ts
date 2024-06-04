@@ -75,7 +75,7 @@ router.post("/user/signup", async (req, res) => {
     console.log("Token expires : ", new Date(Date.now() + 3600000));
 
     // store the token in the database
-    await prisma.admin.update({
+    await prisma.user.update({
       where: { id: newUser.id },
       data: {
         verificationToken: token,
