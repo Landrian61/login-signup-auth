@@ -88,19 +88,26 @@ router.post("/admin/signup", async (req, res) => {
         to: newAdmin.email,
         subject: "Account Verification",
         html: `
-      <h1>Welcome to NOVA CRM!</h1>
-      <p>Thank you for signing up, ${newAdmin.name}. We're excited to have you on board.</p>
-      <p>To get started, please verify your email address by clicking the button below:</p>
-      <div style="text-align: center;">
-        <a href="http://localhost:4000/auth/api_admin/admin/verify-email?token=${token}" 
-           style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: blue; text-decoration: none; border-radius: 5px;">
-           Verify Your Account
-        </a>
-      </div>
-      <p>If the button above doesn't work, you can copy and paste the following link into your browser:</p>
-      <p>http://localhost:4000/auth/api_admin/admin/verify-email?token=${token}</p>
-      <p>Best regards,<br>The Team</p>
-    `,
+        <div style="font-family: Arial, sans-serif; color: #333;">
+          <h1 style="color: #2c3e50;">Welcome to NOVA CRM!</h1>
+          <p>Thank you for signing up, ${newAdmin.name}. We're excited to have you on board.</p>
+          <p>To get started, please verify your email address by clicking the button below:</p>
+          <div style="text-align: center; margin: 20px 0;">
+            <a href="http://localhost:3000/verifyEmail" 
+               style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: teal; text-decoration: none; border-radius: 5px;">
+               Verify Your Account
+            </a>
+          </div>
+          <p>If the button above doesn't work, you can copy and paste the following link into your browser:</p>
+          <p style="word-break: break-all;">http://localhost:4000/auth/api_admin/admin/verify-email?token=${token}</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+          <p>Best regards,<br>The Team</p>
+          <footer style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #eee; font-size: 12px; color: #999;">
+            <p>This email was sent to ${newAdmin.email}. If you did not sign up for this account, please ignore this email.</p>
+            <p style="margin-top: 10px;">NOVA CRM, 123 Business Rd, Business City, BC 12345</p>
+          </footer>
+        </div>
+        `,
       });
 
       res.status(201).send({
@@ -111,7 +118,7 @@ router.post("/admin/signup", async (req, res) => {
       return res.status(400).json(error);
     }
   } catch (error) {
-    console.error("Error creating admin account");
+    console.error("Error creating admin account:", error);
     res.status(400).send({ message: "Error creating admin's account" });
   }
 });
@@ -163,7 +170,7 @@ router.get("/admin/verify-email", async (req, res) => {
 
     res.status(200).json({ message: "Admin verified successfully", admin });
   } catch (error) {
-    console.error("Error verifying admin accoun: ", error);
+    console.error("Error verifying admin account: ", error);
     res.status(400).send({ message: "Error verifying admin account" });
   }
 });
@@ -214,19 +221,26 @@ router.post("/admin/reverify", async (req, res) => {
         to: admin.email,
         subject: "Account Verification",
         html: `
-      <h1>Welcome to NOVA CRM!</h1>
-      <p>Thank you for signing up, ${admin.name}. We're excited to have you on board.</p>
-      <p>To get started, please verify your email address by clicking the button below:</p>
-      <div style="text-align: center;">
-        <a href="http://localhost:4000/auth/api_admin/admin/verify-email?token=${token}" 
-           style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: blue; text-decoration: none; border-radius: 5px;">
-           Verify Your Account
-        </a>
+      <div style="font-family: Arial, sans-serif; color: #333;">
+        <h1 style="color: #2c3e50;">Welcome to NOVA CRM!</h1>
+        <p>Thank you for signing up, ${admin.name}. We're excited to have you on board.</p>
+        <p>To get started, please verify your email address by clicking the button below:</p>
+        <div style="text-align: center; margin: 20px 0;">
+          <a href="http://localhost:4000/auth/api_admin/admin/verify-email?token=${token}" 
+             style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: teal; text-decoration: none; border-radius: 5px;">
+             Verify Your Account
+          </a>
+        </div>
+        <p>If the button above doesn't work, you can copy and paste the following link into your browser:</p>
+        <p style="word-break: break-all;">http://localhost:4000/auth/api_admin/admin/verify-email?token=${token}</p>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        <p>Best regards,<br>The Team</p>
+        <footer style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #eee; font-size: 12px; color: #999;">
+          <p>This email was sent to ${admin.email}. If you did not sign up for this account, please ignore this email.</p>
+          <p style="margin-top: 10px;">NOVA CRM, 123 Business Rd, Business City, BC 12345</p>
+        </footer>
       </div>
-      <p>If the button above doesn't work, you can copy and paste the following link into your browser:</p>
-      <p>http://localhost:4000/auth/api_admin/admin/verify-email?token=${token}</p>
-      <p>Best regards,<br>The Team</p>
-    `,
+      `,
       });
       res.status(200).send({
         message: "Verification email has been resent.",
@@ -238,6 +252,31 @@ router.post("/admin/reverify", async (req, res) => {
   } catch (error) {
     console.error("Error re-verifying admin account:", error);
     res.status(400).send({ message: "Error re-verifying admin's account" });
+  }
+});
+
+// Check verification status
+router.get("/admin/check-verification", async (req, res) => {
+  const email = req.query.email as string;
+
+  if (!email) {
+    return res.status(400).json({ error: "Email is required" });
+  }
+
+  try {
+    const admin = await prisma.admin.findUnique({
+      where: { email },
+      select: { isVerified: true },
+    });
+
+    if (!admin) {
+      return res.status(404).json({ error: "Admin not found" });
+    }
+
+    res.json({ isVerified: admin.isVerified });
+  } catch (error) {
+    console.error("Error checking verification status:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

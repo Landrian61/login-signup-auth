@@ -14,12 +14,9 @@
     "@prisma/client": "^5.14.0",
     "@types/node": "^20.12.13",
     "bcryptjs": "^2.4.3",
-<<<<<<< HEAD
-    "dotenv": "^16.4.5",
-=======
     "connect-redis": "^7.1.1",
     "cors": "^2.8.5",
->>>>>>> d571ae0e2d2964a08023ff939b3460b4c4c9c912
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-rate-limit": "^7.3.0",
     "express-session": "^1.18.0",

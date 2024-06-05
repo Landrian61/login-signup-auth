@@ -39,7 +39,7 @@ interface AdminSession extends Session {
 }
 
 //admin login
-router.get("/admin/login", limiter, async (req, res) => {
+router.post("/admin/login", limiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
